@@ -1,13 +1,16 @@
 package com.sjcqs.rawlauncher.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.IdRes;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -68,6 +71,14 @@ public class UserInputView extends RelativeLayout {
             setIconView(imageDrawable);
         }
 
+        iconView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
+                context.startActivity(intent);
+            }
+        });
+
         setHint(hint);
 
         if (requestFocus) {
@@ -115,9 +126,12 @@ public class UserInputView extends RelativeLayout {
         });
     }
 
-    private void setOnEditorActionListener(TextView.OnEditorActionListener listener){
+    public void setOnEditorActionListener(TextView.OnEditorActionListener listener){
         userEditText.setOnEditorActionListener(listener);
     }
 
+    public void addTextChangedListener(TextWatcher watcher){
+        userEditText.addTextChangedListener(watcher);
+    }
 
 }
