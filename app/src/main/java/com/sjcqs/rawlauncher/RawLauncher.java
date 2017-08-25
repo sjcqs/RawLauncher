@@ -1,11 +1,17 @@
 package com.sjcqs.rawlauncher;
 
+import android.app.WallpaperManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.sjcqs.rawlauncher.items.apps.AppManager;
 import com.sjcqs.rawlauncher.items.suggestions.SuggestionManager;
@@ -23,17 +29,17 @@ public class RawLauncher extends AppCompatActivity {
     private static final int UI_ANIMATION_DELAY = 300;
     private static final String TAG = RawLauncher.class.getName();
     private UserInputView inputView;
+    private View rootView;
     private AppManager appManager;
     private SuggestionManager suggestionManager;
     private RecyclerView suggestionRecyclerView;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_raw_launcher);
+        rootView = getLayoutInflater().inflate(R.layout.activity_raw_launcher,null);
+        setContentView(rootView);
         appManager = new AppManager(this);
         inputView = (UserInputView) findViewById(R.id.user_input_view);
         suggestionRecyclerView = (RecyclerView) findViewById(R.id.suggestions);
@@ -46,13 +52,13 @@ public class RawLauncher extends AppCompatActivity {
             }
 
             @Override
-            public void onTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 if (charSequence.length() > 0){
+                    final String str = charSequence.toString();
                     inputView.post(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d(TAG, "onTextChanged: " + charSequence + ", start: " + i + ", before: " + i1 + ", count: "+i2);
-                            suggestionManager.suggest(charSequence.toString());
+                            suggestionManager.suggest(str);
                         }
                     });
                 } else {
@@ -70,5 +76,20 @@ public class RawLauncher extends AppCompatActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+        final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+
+        rootView.post(new Runnable() {
+
+            @Override
+            public void run() {
+                rootView.setBackground(wallpaperDrawable);
+            }
+        });
     }
 }

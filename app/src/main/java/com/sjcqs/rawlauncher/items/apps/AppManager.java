@@ -7,12 +7,12 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.sjcqs.rawlauncher.items.Item;
+import com.sjcqs.rawlauncher.items.suggestions.Suggestion;
+import com.sjcqs.rawlauncher.items.suggestions.SuggestionList;
 import com.sjcqs.rawlauncher.utils.StringUtil;
 import com.sjcqs.rawlauncher.utils.interfaces.Manager;
 import com.sjcqs.rawlauncher.utils.interfaces.SuggestionUpdator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,9 +43,6 @@ public class AppManager extends Manager implements LoaderManager.LoaderCallbacks
     @Override
     public void onLoadFinished(Loader<List<App>> loader, List<App> data) {
         apps = data;
-        for (App app : apps) {
-            Log.d(TAG, "app: "+app.getLabel());
-        }
     }
 
     @Override
@@ -55,23 +52,24 @@ public class AppManager extends Manager implements LoaderManager.LoaderCallbacks
 
 
     @Override
-    public SuggestionUpdate updateSuggestions(String input, List<Item> current) {
-        List<Item> toAdd = new ArrayList<>();
-        List<Item> toRemove = new ArrayList<>();
+    public SuggestionUpdate updateSuggestions(String input, SuggestionList current) {
+        SuggestionList toAdd = new SuggestionList();
+        SuggestionList toRemove = new SuggestionList();
         if (isLoaded()) {
-            for (App app : apps) {
+            for (Suggestion item : current){
+                App app = (App) item.getItem();
                 String str2 = app.getLabel();
-                if (StringUtil.canBeSuggested(input,str2) && !current.contains(app)){
-                    toAdd.add(app);
-                }
-            }
-            for (Item item : current){
-                App app = (App)item;
-                String str2 = app.getLabel();
-                if (!StringUtil.canBeSuggested(input,str2) && current.contains(app)){
-                    toRemove.add(app);
+                if (StringUtil.canBeSuggested(input,str2) > StringUtil.MAX_RATE && current.containsItem(app)){
+                    toRemove.add(item);
                 }
 
+            }
+            for (App app : apps) {
+                String str2 = app.getLabel();
+                double rate = StringUtil.canBeSuggested(input,str2);
+                if (rate < StringUtil.MAX_RATE && !current.containsItem(app)){
+                    toAdd.add(new Suggestion(app,rate));
+                }
             }
         }
         return new SuggestionUpdate(toRemove,toAdd);

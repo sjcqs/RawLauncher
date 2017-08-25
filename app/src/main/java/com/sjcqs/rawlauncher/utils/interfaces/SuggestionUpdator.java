@@ -1,6 +1,7 @@
 package com.sjcqs.rawlauncher.utils.interfaces;
 
-import com.sjcqs.rawlauncher.items.Item;
+import com.sjcqs.rawlauncher.items.suggestions.Suggestion;
+import com.sjcqs.rawlauncher.items.suggestions.SuggestionList;
 
 import java.util.List;
 
@@ -10,22 +11,22 @@ import java.util.List;
 
 public interface SuggestionUpdator {
 
-    SuggestionUpdate updateSuggestions(String input, List<Item> current);
+    SuggestionUpdate updateSuggestions(String input, SuggestionList current);
 
-    public static class SuggestionUpdate{
-        private List<Item> toRemove;
-        private List<Item> toAdd;
+    class SuggestionUpdate{
+        private SuggestionList toRemove;
+        private SuggestionList toAdd;
 
-        public SuggestionUpdate(List<Item> toRemove, List<Item> toAdd) {
+        public SuggestionUpdate(SuggestionList toRemove, SuggestionList toAdd) {
             this.toRemove = toRemove;
             this.toAdd = toAdd;
         }
 
-        public List<Item> getToRemove() {
+        public List<Suggestion> getToRemove() {
             return toRemove;
         }
 
-        public List<Item> getToAdd() {
+        public List<Suggestion> getToAdd() {
             return toAdd;
         }
     }

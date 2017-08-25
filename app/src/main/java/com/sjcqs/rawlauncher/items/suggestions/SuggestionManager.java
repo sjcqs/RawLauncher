@@ -4,9 +4,12 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,40 +17,39 @@ import com.sjcqs.rawlauncher.R;
 import com.sjcqs.rawlauncher.items.Item;
 import com.sjcqs.rawlauncher.items.apps.App;
 import com.sjcqs.rawlauncher.items.apps.AppManager;
-import com.sjcqs.rawlauncher.utils.interfaces.Launchable;
+import com.sjcqs.rawlauncher.utils.interfaces.OnItemLaunchedListener;
 import com.sjcqs.rawlauncher.utils.interfaces.SuggestionUpdator;
 import com.sjcqs.rawlauncher.utils.interfaces.Suggestor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Created by satyan on 8/25/17.
  */
 
-public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.ItemHolder> implements Suggestor, Launchable {
+public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.ItemHolder> implements Suggestor {
     private static final String TAG = SuggestionManager.class.getName();
     private final AppManager appManager;
     private final Context context;
+    private OnItemLaunchedListener onItemLaunchedListener;
 
-    private List<Item> suggestions;
-    private Map<Class<? extends Item>, List<Item>> suggestionsMap;
+    private SuggestionList suggestions;
+    private Map<Class<? extends Item>, SuggestionList> suggestionsMap;
+    private int lastPosition = -1;
 
     public SuggestionManager(AppManager appManager, Context context) {
         this.appManager = appManager;
         this.context = context;
-        suggestions = new ArrayList<>();
+        suggestions = new SuggestionList();
         suggestionsMap = new ArrayMap<>();
     }
 
 
     @Override
-    public List<? extends Item> suggest(String input) {
-        List<Item> apps = suggestionsMap.get(App.class);
+    public SuggestionList suggest(String input) {
+        SuggestionList apps = suggestionsMap.get(App.class);
         if (apps == null){
-            apps = new ArrayList<>();
+            apps = new SuggestionList();
         }
         updateSuggestions(App.class,appManager.updateSuggestions(input,apps));
 
@@ -55,21 +57,22 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
     }
 
     private void updateSuggestions(Class<? extends Item> itemClass, SuggestionUpdator.SuggestionUpdate update) {
-        List<Item> items = suggestionsMap.get(itemClass);
+        SuggestionList items = suggestionsMap.get(itemClass);
         if (items == null){
-            items = new ArrayList<>();
+            items = new SuggestionList();
         }
 
         items.addAll(update.getToAdd());
         suggestions.addAll(update.getToAdd());
 
-        Collections.sort(suggestions,Item.ALPHA_COMPARATOR);
         items.removeAll(update.getToRemove());
         suggestions.removeAll(update.getToRemove());
 
         suggestionsMap.put(App.class,items);
 
-        notifyDataSetChanged();
+        if (!update.getToAdd().isEmpty() || !update.getToRemove().isEmpty()){
+            notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -108,12 +111,22 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
         return suggestions.size();
     }
 
+    public void clearOnItemLaunchedListener() {
+        onItemLaunchedListener = null;
+    }
+
+    public void setOnItemLaunchedListener(OnItemLaunchedListener listener) {
+        this.onItemLaunchedListener = listener;
+    }
+
     class ItemHolder extends RecyclerView.ViewHolder {
+        View view;
         private TextView labelView;
         private ImageView iconView;
 
         ItemHolder(View itemView) {
             super(itemView);
+            view = itemView;
             labelView = itemView.findViewById(R.id.label);
             iconView = itemView.findViewById(R.id.item_icon);
         }

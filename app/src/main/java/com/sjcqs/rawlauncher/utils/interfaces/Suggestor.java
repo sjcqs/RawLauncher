@@ -1,6 +1,7 @@
 package com.sjcqs.rawlauncher.utils.interfaces;
 
 import com.sjcqs.rawlauncher.items.Item;
+import com.sjcqs.rawlauncher.items.suggestions.SuggestionList;
 
 import java.util.List;
 
@@ -9,6 +10,6 @@ import java.util.List;
  */
 
 public interface Suggestor {
-    List<? extends Item> suggest(String input);
+    SuggestionList suggest(String input);
     void clearSuggestions();
 }

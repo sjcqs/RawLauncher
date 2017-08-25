@@ -5,10 +5,12 @@ import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.GestureDetectorCompat;
+import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -172,7 +174,6 @@ public class UserInputView extends RelativeLayout {
         private final int DISTANCE_THRESHOLD = 100;
         @Override
         public boolean onDown(MotionEvent motionEvent) {
-            Log.d(TAG, "onDown:");
             return false;
         }
 
@@ -181,7 +182,6 @@ public class UserInputView extends RelativeLayout {
             Point p0 = new Point((int)fromEvent.getX(),(int)fromEvent.getY());
             Point p1 = new Point((int)toEvent.getX(),(int)toEvent.getY());
             Direction direction = getDirection(p0,p1);
-            Log.d(TAG, "onFling: "+direction);
             switch (direction){
                 case NORTH:
                     break;
