@@ -3,26 +3,19 @@ package com.sjcqs.rawlauncher.items.apps;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 
+import com.sjcqs.rawlauncher.items.Item;
+
 import java.io.File;
-import java.text.Collator;
-import java.util.Comparator;
-import java.util.Locale;
 
 /**
  * Created by satyan on 8/24/17.
  */
 
-class App extends Item{
-    static final Comparator<? super App> ALPHA_COMPARATOR = new Comparator<App>() {
-        private final Collator COLLATOR = Collator.getInstance(Locale.getDefault());
+public class App extends Item{
 
-        @Override
-        public int compare(App app1, App app2) {
-            return (COLLATOR.compare(app1.getLabel(), app2.getLabel()));
-        }
-    };
     private final Context context;
     private final ApplicationInfo info;
 
@@ -82,7 +75,8 @@ class App extends Item{
         }
     }
 
-    public Intent getLaunchIntentForPackage(){
+    @Override
+    public Intent getIntent(){
         return context.getPackageManager().getLaunchIntentForPackage(getPackageName());
     }
 }

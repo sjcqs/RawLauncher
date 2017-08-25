@@ -5,6 +5,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.content.AsyncTaskLoader;
 
+import com.sjcqs.rawlauncher.items.Item;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +47,7 @@ public class AppsLoader extends AsyncTaskLoader<List<App>> {
             }
         }
 
-        Collections.sort(items, App.ALPHA_COMPARATOR);
+        Collections.sort(items, Item.ALPHA_COMPARATOR);
         return items;
     }
 
@@ -57,15 +59,14 @@ public class AppsLoader extends AsyncTaskLoader<List<App>> {
             }
         }
 
-        List<App> items = data;
         this.apps = data;
 
         if (isStarted()){
             super.deliverResult(data);
         }
 
-        if (items != null){
-            cleanUp(items);
+        if (data != null){
+            cleanUp(data);
         }
 
     }

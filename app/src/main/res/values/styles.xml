@@ -16,4 +16,9 @@
         <item name="android:windowShowWallpaper">true</item>
     </style>
 
+    <style name="label_style">
+        <item name="android:textSize">@dimen/font_large</item>
+        <item name="android:textColor">@color/color_white</item>
+    </style>
+
 </resources>

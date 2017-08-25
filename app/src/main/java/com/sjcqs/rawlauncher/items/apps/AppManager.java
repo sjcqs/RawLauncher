@@ -7,13 +7,13 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.sjcqs.rawlauncher.items.Item;
 import com.sjcqs.rawlauncher.utils.StringUtil;
 import com.sjcqs.rawlauncher.utils.interfaces.Manager;
+import com.sjcqs.rawlauncher.utils.interfaces.SuggestionUpdator;
 
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -21,7 +21,7 @@ import java.util.Locale;
  * Manage
  */
 
-public class AppManager extends Manager implements LoaderManager.LoaderCallbacks<List<App>> {
+public class AppManager extends Manager implements LoaderManager.LoaderCallbacks<List<App>>,SuggestionUpdator {
     private static final String TAG = AppManager.class.getName();
     private List<App> apps;
 
@@ -53,20 +53,27 @@ public class AppManager extends Manager implements LoaderManager.LoaderCallbacks
         apps = null;
     }
 
-    public List<App> suggestApps(String str1){
-        List<App> suggestions = new ArrayList<>();
+
+    @Override
+    public SuggestionUpdate updateSuggestions(String input, List<Item> current) {
+        List<Item> toAdd = new ArrayList<>();
+        List<Item> toRemove = new ArrayList<>();
         if (isLoaded()) {
-            Log.d(TAG, "===============");
             for (App app : apps) {
                 String str2 = app.getLabel();
-                if (StringUtil.canBeSuggested(str1,str2)){
-                    suggestions.add(app);
-                    Log.d(TAG, "suggestApps: "+str2);
+                if (StringUtil.canBeSuggested(input,str2) && !current.contains(app)){
+                    toAdd.add(app);
                 }
             }
-            Log.d(TAG, "===============");
-        }
-        return suggestions;
-    }
+            for (Item item : current){
+                App app = (App)item;
+                String str2 = app.getLabel();
+                if (!StringUtil.canBeSuggested(input,str2) && current.contains(app)){
+                    toRemove.add(app);
+                }
 
+            }
+        }
+        return new SuggestionUpdate(toRemove,toAdd);
+    }
 }

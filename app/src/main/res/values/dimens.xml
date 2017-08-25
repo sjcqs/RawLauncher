@@ -2,10 +2,18 @@
 <resources>
 
     <!-- font sizes -->
-    <dimen name="font_larger">22sp</dimen>
-    <dimen name="font_large">18sp</dimen>
-    <dimen name="font_normal">15sp</dimen>
+    <dimen name="font_larger">24sp</dimen>
+    <dimen name="font_large">20sp</dimen>
+    <dimen name="font_medium">18sp</dimen>
+    <dimen name="font_normal">16sp</dimen>
     <dimen name="font_small">12sp</dimen>
+
+    <!--  image sizes -->
+    <dimen name="image_larger">96dp</dimen>
+    <dimen name="image_large">72dp</dimen>
+    <dimen name="image_normal">48dp</dimen>
+    <dimen name="image_small">36dp</dimen>
+    <dimen name="image_smaller">24dp</dimen>
 
     <!-- typical spacing between two views -->
     <dimen name="spacing_huge">36dp</dimen>
