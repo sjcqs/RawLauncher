@@ -4,12 +4,9 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -83,7 +80,6 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
         notifyItemRangeRemoved(0,size);
     }
 
-
     @Override
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_view,parent,false);
@@ -100,6 +96,7 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
 
                 @Override
                 public void onClick(View view) {
+                    onItemLaunchedListener.onItemLaunched(item);
                     context.startActivity(item.getIntent());
                 }
             });

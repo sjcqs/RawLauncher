@@ -7,5 +7,5 @@ import com.sjcqs.rawlauncher.items.Item;
  */
 
 public interface OnItemLaunchedListener {
-        void itemLaunched(Item item);
+        void onItemLaunched(Item item);
 }

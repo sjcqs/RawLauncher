@@ -41,4 +41,8 @@ public abstract class Item {
     }
 
     public abstract Intent getIntent();
+
+    public String getInput() {
+        return label.toString();
+    }
 }

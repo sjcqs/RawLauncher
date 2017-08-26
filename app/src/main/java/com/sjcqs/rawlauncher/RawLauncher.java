@@ -13,8 +13,10 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import com.sjcqs.rawlauncher.items.Item;
 import com.sjcqs.rawlauncher.items.apps.AppManager;
 import com.sjcqs.rawlauncher.items.suggestions.SuggestionManager;
+import com.sjcqs.rawlauncher.utils.interfaces.OnItemLaunchedListener;
 import com.sjcqs.rawlauncher.views.UserInputView;
 
 /**
@@ -45,10 +47,17 @@ public class RawLauncher extends AppCompatActivity {
         suggestionRecyclerView = (RecyclerView) findViewById(R.id.suggestions);
         suggestionManager = new SuggestionManager(appManager, this);
         suggestionRecyclerView.setAdapter(suggestionManager);
+
+        suggestionManager.setOnItemLaunchedListener(new OnItemLaunchedListener() {
+            @Override
+            public void onItemLaunched(Item item) {
+                inputView.setInput(item.getInput());
+            }
+        });
+
         inputView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
             }
 
             @Override
@@ -83,6 +92,7 @@ public class RawLauncher extends AppCompatActivity {
         super.onResume();
         WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
         final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+        inputView.clearInput();
 
         rootView.post(new Runnable() {
 
