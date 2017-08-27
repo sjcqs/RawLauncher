@@ -3,6 +3,7 @@ package com.sjcqs.rawlauncher.items.suggestions;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.util.SortedList;
+import android.util.Log;
 
 import com.sjcqs.rawlauncher.items.Item;
 
@@ -27,10 +28,11 @@ public class SuggestionList implements List<Suggestion>  {
         private final Collator COLLATOR = Collator.getInstance(Locale.getDefault());
 
         @Override
-        public int compare(Suggestion o1, Suggestion o2) {
-            int rateCmp = Double.compare(o1.getRate(),o2.getRate());
-            return rateCmp == 0 ?
-                    rateCmp : (COLLATOR.compare(o1.getLabel(), o2.getLabel()));
+        public int compare(Suggestion item1, Suggestion item2) {
+            double rate1 = item1.getRate(), rate2 = item2.getRate();
+            int rateCmp = Double.compare(rate1,rate2);
+            return (rateCmp != 0 ?
+                    rateCmp : (COLLATOR.compare(item1.getLabel(), item2.getLabel())));
         }
 
         @Override
@@ -79,7 +81,7 @@ public class SuggestionList implements List<Suggestion>  {
 
     @Override
     public boolean isEmpty() {
-        return list.size() == 0;
+        return size() == 0;
     }
 
     @Override

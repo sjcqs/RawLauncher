@@ -1,6 +1,7 @@
 package com.sjcqs.rawlauncher.items.suggestions;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.sjcqs.rawlauncher.items.Item;
 
@@ -19,9 +20,11 @@ public class Suggestion extends Item{
 
                 @Override
                 public int compare(Suggestion item1, Suggestion item2) {
-                    int rateCmp = Double.compare(item1.getRate(),item2.getRate());
-                    return rateCmp == 0 ?
-                            rateCmp : (COLLATOR.compare(item1.getLabel(), item2.getLabel()));
+                    double rate1 = item1.getRate(), rate2 = item2.getRate();
+                    int rateCmp = Double.compare(rate1,rate2);
+                    Log.d("Compare", rateCmp + ": "+ COLLATOR.compare(item1.getLabel(), item2.getLabel()));
+                    return (rateCmp != 0 ?
+                            rateCmp : (COLLATOR.compare(item1.getLabel(), item2.getLabel())));
                 }
             };
 

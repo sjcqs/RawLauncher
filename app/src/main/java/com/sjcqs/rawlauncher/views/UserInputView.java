@@ -14,6 +14,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,13 +29,13 @@ public class UserInputView extends RelativeLayout {
     private EditText userEditText;
     private ImageButton iconButton;
     private ImageButton clearButton;
+    private OnActionDoneListener onActionDoneListener;
 
     private Drawable imageDrawable;
     private String hint;
     private boolean requestFocus = true;
     private boolean showClearButton = true;
     private GestureDetectorCompat detector;
-
 
     public UserInputView(Context context) {
         super(context);
@@ -103,10 +104,7 @@ public class UserInputView extends RelativeLayout {
         setHint(hint);
 
         if (requestFocus) {
-            userEditText.requestFocus();
-            InputMethodManager imm =
-                    (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(userEditText, InputMethodManager.SHOW_IMPLICIT);
+            showKeyboard(context);
         }
 
         userEditText.setOnTouchListener(new OnTouchListener() {
@@ -116,7 +114,26 @@ public class UserInputView extends RelativeLayout {
             }
         });
 
+        userEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_GO){
+                    if (onActionDoneListener != null){
+                        return !onActionDoneListener.onActionDone(userEditText.getText().toString());
+                    }
+                }
+                return false;
+            }
+        });
+
         clearInput();
+    }
+
+    public void showKeyboard(Context context) {
+        userEditText.requestFocus();
+        InputMethodManager imm =
+                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(userEditText, InputMethodManager.SHOW_IMPLICIT);
     }
 
     public void setHint(final String hint) {
@@ -150,16 +167,25 @@ public class UserInputView extends RelativeLayout {
             @Override
             public void run() {
                 userEditText.setText(str);
+                userEditText.setSelection(str.length());
             }
         });
     }
 
-    public void setOnEditorActionListener(TextView.OnEditorActionListener listener){
-        userEditText.setOnEditorActionListener(listener);
-    }
-
     public void addTextChangedListener(TextWatcher watcher){
         userEditText.addTextChangedListener(watcher);
+    }
+
+    public void removeTextChangedListener(TextWatcher watcher){
+        userEditText.removeTextChangedListener(watcher);
+    }
+
+    public void setOnActionDoneListener(OnActionDoneListener onActionDoneListener) {
+        this.onActionDoneListener = onActionDoneListener;
+    }
+
+    public void clearOnActionDoneListener(){
+        onActionDoneListener = null;
     }
 
     private enum Direction{
@@ -168,6 +194,15 @@ public class UserInputView extends RelativeLayout {
         EST,
         WEST,
         UNKNOWN
+    }
+
+    public interface OnActionDoneListener{
+        /**
+         * Call when the action done button is pressed
+         * @param str the input text
+         * @return true if the action was consumed, false otherwise
+         */
+        boolean onActionDone(String str);
     }
 
     private class InputGestureListener extends GestureDetector.SimpleOnGestureListener {

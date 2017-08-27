@@ -1,5 +1,6 @@
 package com.sjcqs.rawlauncher.utils.interfaces;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 
 /**
@@ -15,4 +16,6 @@ public abstract class Manager {
     }
 
     public abstract boolean isLoaded();
+
+    public abstract Intent getIntent(String str);
 }

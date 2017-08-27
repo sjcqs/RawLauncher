@@ -1,14 +1,17 @@
 package com.sjcqs.rawlauncher.items.suggestions;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sjcqs.rawlauncher.R;
 import com.sjcqs.rawlauncher.items.Item;
@@ -33,8 +36,9 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
     private SuggestionList suggestions;
     private Map<Class<? extends Item>, SuggestionList> suggestionsMap;
     private int lastPosition = -1;
+    private boolean empty = true;
 
-    public SuggestionManager(AppManager appManager, Context context) {
+    public SuggestionManager(final Context context, AppManager appManager) {
         this.appManager = appManager;
         this.context = context;
         suggestions = new SuggestionList();
@@ -114,6 +118,16 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
 
     public void setOnItemLaunchedListener(OnItemLaunchedListener listener) {
         this.onItemLaunchedListener = listener;
+    }
+
+    public Intent getIntent(int i) {
+        try {
+            Suggestion suggestion = suggestions.get(i);
+            return  suggestion.getIntent();
+        } catch (IndexOutOfBoundsException e){
+            Log.w(TAG, "getIntent: " + e.getLocalizedMessage());
+            return null;
+        }
     }
 
     class ItemHolder extends RecyclerView.ViewHolder {

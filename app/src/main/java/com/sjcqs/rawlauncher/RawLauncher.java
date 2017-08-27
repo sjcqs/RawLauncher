@@ -1,17 +1,12 @@
 package com.sjcqs.rawlauncher;
 
-import android.app.WallpaperManager;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 import com.sjcqs.rawlauncher.items.Item;
 import com.sjcqs.rawlauncher.items.apps.AppManager;
@@ -45,8 +40,44 @@ public class RawLauncher extends AppCompatActivity {
         appManager = new AppManager(this);
         inputView = (UserInputView) findViewById(R.id.user_input_view);
         suggestionRecyclerView = (RecyclerView) findViewById(R.id.suggestions);
-        suggestionManager = new SuggestionManager(appManager, this);
+        suggestionManager = new SuggestionManager(this, appManager);
         suggestionRecyclerView.setAdapter(suggestionManager);
+
+        suggestionRecyclerView.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
+            @Override
+            public void onChildViewAttachedToWindow(View view) {
+                if (suggestionManager.getItemCount() > 0){
+                    if (suggestionRecyclerView.getVisibility() == View.INVISIBLE){
+                        suggestionRecyclerView.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildViewDetachedFromWindow(View view) {
+                if (suggestionManager.getItemCount() == 0){
+                    if (suggestionRecyclerView.getVisibility() == View.VISIBLE){
+                        suggestionRecyclerView.setVisibility(View.INVISIBLE);
+                    }
+                }
+            }
+        });
+
+        inputView.setOnActionDoneListener(new UserInputView.OnActionDoneListener() {
+            @Override
+            public boolean onActionDone(String str) {
+                Intent intent = appManager.getIntent(str);
+                if (intent == null){
+                    intent = suggestionManager.getIntent(0);
+                }
+                if (intent != null){
+                    startActivity(intent);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
 
         suggestionManager.setOnItemLaunchedListener(new OnItemLaunchedListener() {
             @Override
@@ -83,23 +114,8 @@ public class RawLauncher extends AppCompatActivity {
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-        final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
         inputView.clearInput();
-
-        rootView.post(new Runnable() {
-
-            @Override
-            public void run() {
-                rootView.setBackground(wallpaperDrawable);
-            }
-        });
     }
 }

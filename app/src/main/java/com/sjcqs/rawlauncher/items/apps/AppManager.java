@@ -1,6 +1,7 @@
 package com.sjcqs.rawlauncher.items.apps;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -48,6 +49,17 @@ public class AppManager extends Manager implements LoaderManager.LoaderCallbacks
     @Override
     public void onLoaderReset(Loader<List<App>> loader) {
         apps = null;
+    }
+
+    @Override
+    public Intent getIntent(String str) {
+        str = StringUtil.normalize(str);
+        for (App app : apps) {
+            if (str.equalsIgnoreCase(app.getLabel())){
+                return app.getIntent();
+            }
+        }
+        return null;
     }
 
 

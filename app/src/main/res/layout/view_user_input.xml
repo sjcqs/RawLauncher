@@ -26,7 +26,7 @@
         android:hint="@string/hint_launch"
         android:textColorHint="@color/color_secondary_light"
         android:imeOptions="actionGo|flagNoFullscreen"
-        android:inputType="textFilter|textNoSuggestions|textShortMessage"
+        android:inputType="textNoSuggestions|textShortMessage"
         android:isScrollContainer="true"
         android:textCursorDrawable="@drawable/user_input_cursor"
         android:background="@null"/>
