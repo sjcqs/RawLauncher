@@ -41,5 +41,6 @@ public class AppManager extends Manager<App> implements Reloadable {
     @Override
     public void reload() {
         loaderManager.restartLoader(LoaderUtils.APP_LOADER,null,this);
+
     }
 }

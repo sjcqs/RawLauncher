@@ -40,7 +40,6 @@ public class RawLauncher extends AppCompatActivity {
         setContentView(rootView);
         appManager = new AppManager(this, getSupportLoaderManager());
         deviceSettingManager = new DeviceSettingManager(this,getSupportLoaderManager());
-
         inputView = (UserInputView) findViewById(R.id.user_input_view);
 
         suggestionRecyclerView = (RecyclerView) findViewById(R.id.suggestions);

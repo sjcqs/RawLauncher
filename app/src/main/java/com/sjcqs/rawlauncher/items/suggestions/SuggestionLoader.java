@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.sjcqs.rawlauncher.items.apps.AppManager;
 import com.sjcqs.rawlauncher.items.device_settings.DeviceSettingManager;
+import com.sjcqs.rawlauncher.items.apps.AppsLoader;
 
 import java.util.ArrayList;
 import java.util.List;
