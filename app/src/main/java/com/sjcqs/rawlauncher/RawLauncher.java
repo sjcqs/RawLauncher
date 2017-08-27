@@ -122,18 +122,6 @@ public class RawLauncher extends AppCompatActivity {
                 Log.d(TAG, "onGlobalFocusChanged:");
             }
         });
-
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                // TODO Auto-generated method stub
-                Rect r = new Rect();
-                rootView.getWindowVisibleDisplayFrame(r);
-
-                int screenHeight = rootView.getRootView().getHeight();
-                int heightDifference = screenHeight - (r.bottom - r.top);
-            }
-        });
     }
 
     @Override
