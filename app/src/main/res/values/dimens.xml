@@ -13,7 +13,7 @@
     <dimen name="image_large">72dp</dimen>
     <dimen name="image_normal">48dp</dimen>
     <dimen name="image_small">36dp</dimen>
-    <dimen name="image_smaller">24dp</dimen>
+    <dimen name="image_tiny">24dp</dimen>
 
     <!-- typical spacing between two views -->
     <dimen name="spacing_huge">36dp</dimen>
@@ -21,12 +21,12 @@
     <dimen name="spacing_normal">16dp</dimen>
     <dimen name="spacing_small">8dp</dimen>
     <dimen name="spacing_tiny">4dp</dimen>
+    <dimen name="spacing_tinier">2dp</dimen>
 
     <!-- typical sizes of views -->
     <dimen name="button_height_tall">62dp</dimen>
     <dimen name="button_height_normal">48dp</dimen>
     <dimen name="button_height_short">32dp</dimen>
-    <dimen name="button_height_shorter">24dp</dimen>
-    <dimen name="spacing_tinier">2dp</dimen>
+    <dimen name="button_height_tiny">24dp</dimen>
 
 </resources>

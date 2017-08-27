@@ -9,8 +9,8 @@
     android:background="@null">
     <ImageView
         android:id="@+id/item_icon"
-        android:layout_width="@dimen/image_smaller"
-        android:layout_height="@dimen/image_smaller"
+        android:layout_width="@dimen/image_tiny"
+        android:layout_height="@dimen/image_tiny"
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="@dimen/spacing_normal"
         android:contentDescription="@string/contentDescription_icon"/>
