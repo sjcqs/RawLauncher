@@ -7,20 +7,20 @@ android {
         applicationId "com.sjcqs.rawlauncher"
         minSdkVersion 22
         targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "0.1b"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            applicationIdSuffix '.debug'
-            versionNameSuffix '-DEBUG'
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             zipAlignEnabled true
         }
         debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-DEBUG'
             minifyEnabled false
             shrinkResources false
             zipAlignEnabled true
