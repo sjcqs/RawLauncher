@@ -24,6 +24,8 @@ import com.sjcqs.rawlauncher.views.UserInputView;
 
 /**
  * The main launcher context
+ *
+ * TODO: ouvrir quand application seule, trier application par utilisation, raccourcis
  */
 public class RawLauncher extends AppCompatActivity {
 
