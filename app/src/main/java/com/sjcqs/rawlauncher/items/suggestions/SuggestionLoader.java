@@ -36,6 +36,7 @@ class SuggestionLoader extends AsyncTaskLoader<List<Suggestion>> {
         for (Manager manager : managers) {
             items.addAll(manager.getSuggestions(input));
         }
+
         return items;
     }
 
