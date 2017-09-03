@@ -42,4 +42,8 @@ class InputSearch extends Item {
     public double getPriority() {
         return priority;
     }
+
+    public String getName() {
+        return name;
+    }
 }
