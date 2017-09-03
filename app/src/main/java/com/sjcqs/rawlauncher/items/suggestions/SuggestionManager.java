@@ -61,10 +61,9 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
 
     @Override
     public void clearSuggestions() {
-        int size = suggestions.size();
         suggestions.clear();
         loaderManager.destroyLoader(ManagerUtils.ID_SUGGESTION_LOADER);
-        notifyItemRangeRemoved(0,size);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -126,6 +125,9 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
         suggestions.clear();
         suggestions.addAll(data);
         Collections.sort(suggestions,Suggestion.SUGGESTION_COMPARATOR);
+        for (Suggestion suggestion : suggestions) {
+            Log.d(TAG, suggestion.getLabel() + ": " + suggestion.getRate());
+        }
         notifyDataSetChanged();
     }
 
