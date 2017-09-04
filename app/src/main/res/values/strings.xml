@@ -13,4 +13,5 @@
     <string name="blacklist_shared_pref">Blacklist string set</string>
     <string name="hide_suggestion_content_desc">Hide suggestion</string>
     <string name="uninstall_suggestion_content_desc">Remove suggestion</string>
+    <string name="hide_shared_pref">%1$s : hidden</string>
 </resources>

@@ -20,6 +20,7 @@ import android.view.View;
 import com.sjcqs.rawlauncher.items.Item;
 import com.sjcqs.rawlauncher.items.apps.AppManager;
 import com.sjcqs.rawlauncher.items.shortcuts.ShortcutManager;
+import com.sjcqs.rawlauncher.items.suggestions.Suggestion;
 import com.sjcqs.rawlauncher.items.suggestions.SuggestionManager;
 import com.sjcqs.rawlauncher.utils.ManagerUtils;
 import com.sjcqs.rawlauncher.utils.interfaces.Manager;
@@ -104,6 +105,8 @@ public class RawLauncher extends AppCompatActivity implements OnItemLaunchedList
 
             @Override
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                int position = viewHolder.getAdapterPosition();
+                Item item = suggestionManager.getItem(position);
                 View itemView = viewHolder.itemView;
                 // not sure why, but this method get's called for viewholder that are already swiped away
                 if (viewHolder.getAdapterPosition() == -1) {
@@ -135,7 +138,8 @@ public class RawLauncher extends AppCompatActivity implements OnItemLaunchedList
                     if (dX > start) {
                         hideIcon.draw(c);
                     }
-                } else if (dX < 0) {
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                } else if (dX < 0 && item.canBeUninstalled()) {
                     // draw red uninstallBg
                     uninstallBg.setBounds(
                             itemView.getRight() + (int) dX, itemView.getTop(),
@@ -155,20 +159,24 @@ public class RawLauncher extends AppCompatActivity implements OnItemLaunchedList
                     uninstallIcon.setBounds(start, top, end, bottom);
 
                     uninstallIcon.draw(c);
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
                 }
-
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
+                Suggestion item = suggestionManager.getSuggestion(position);
                 switch (direction) {
                     case ItemTouchHelper.LEFT:
-                        suggestionManager.uninstallApp(position);
+                        if (item.getItem().canBeUninstalled()) {
+                            suggestionManager.uninstallApp(item);
+                        }
                         break;
                     case ItemTouchHelper.RIGHT:
-                        suggestionManager.hideItem(position);
+                        suggestionManager.hideItem(item);
+                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(RawLauncher.this);
+                        pref.edit().putBoolean(getString(R.string.hide_shared_pref, item.getDiscriminator()), true).apply();
                         break;
                     default:
                         break;
@@ -235,7 +243,7 @@ public class RawLauncher extends AppCompatActivity implements OnItemLaunchedList
     }
 
     private void updateItemStats(Item item) {
-        if (item.isShortcutable()) {
+        if (item.canBeAShortcut()) {
             SharedPreferences pref =
                     PreferenceManager.getDefaultSharedPreferences(this);
             String label = item.getDiscriminator();
@@ -257,7 +265,9 @@ public class RawLauncher extends AppCompatActivity implements OnItemLaunchedList
         super.onResume();
         inputView.showKeyboard(this);
         shortcutManager.update();
-        suggestionManager.clearSuggestions();
+        if (inputView.getInput().length() == 0) {
+            suggestionManager.clearSuggestions();
+        }
         for (Manager manager : managers.values()) {
             manager.reload();
         }

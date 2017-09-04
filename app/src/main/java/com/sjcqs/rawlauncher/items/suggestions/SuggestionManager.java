@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.util.ArraySet;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by satyan on 8/25/17.
@@ -45,7 +43,6 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
     private OnItemLaunchedListener onItemLaunchedListener;
 
     private List<Suggestion> suggestions;
-    private Set<String> hiddenItems;
     private boolean idle = true;
 
     public SuggestionManager(Context context, LoaderManager supportLoaderManager, Collection<Manager> managers) {
@@ -54,18 +51,6 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
         searchManager = new InputSearchManager(context,loaderManager);
         this.managers = managers;
         suggestions = new ArrayList<>();
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        hiddenItems = pref.getStringSet(
-                context.getString(R.string.blacklist_shared_pref),
-                new ArraySet<String>()
-        );
-
-        Log.d(TAG, "SuggestionManager (hidden): " + hiddenItems.size());
-        String str = "";
-        for (String hiddenItem : hiddenItems) {
-            str += " " + hiddenItem + ";";
-        }
-        Log.d(TAG, "SuggestionManager (hidden): " + str);
     }
 
 
@@ -143,27 +128,28 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
     }
 
     public void hideItem(Suggestion item) {
-        Log.d(TAG, "hideItem: " + item.getDiscriminator());
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        hiddenItems.add(item.getDiscriminator());
-
-        pref.edit()
-                .putStringSet(context.getString(R.string.blacklist_shared_pref), hiddenItems).apply();
-
         suggestions.remove(item);
+        notifyDataSetChanged();
+    }
+
+    public void uninstallApp(Suggestion suggestion) {
+        Item item = suggestion.getItem();
+        Intent intent = item.getUninstallIntent();
+        context.startActivity(intent);
+        suggestions.remove(suggestion);
+        notifyDataSetChanged();
     }
 
     public void hideItem(int position) {
         hideItem(suggestions.get(position));
-        notifyDataSetChanged();
-    }
-
-    public void uninstallApp(int position) {
-
     }
 
     public Item getItem(int i) {
         return suggestions.get(i).getItem();
+    }
+
+    public Suggestion getSuggestion(int position) {
+        return suggestions.get(position);
     }
 
     @Override
@@ -175,14 +161,17 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
     @Override
     public void onLoadFinished(Loader<List<Suggestion>> loader, List<Suggestion> data) {
         suggestions.clear();
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         for (Suggestion suggestion : data) {
-            boolean found = false;
-            for (String term : hiddenItems) {
-                if (suggestion.getDiscriminator().equalsIgnoreCase(term)) {
-                    found = true;
-                    break;
-                }
-            }
+            boolean found =
+                    pref.getBoolean(
+                            context.getString(
+                                    R.string.hide_shared_pref,
+                                    suggestion.getDiscriminator()
+                            ),
+                            false
+                    );
             if (!found) {
                 suggestions.add(suggestion);
             }
