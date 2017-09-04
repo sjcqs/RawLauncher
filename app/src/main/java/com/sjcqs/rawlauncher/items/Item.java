@@ -66,4 +66,8 @@ public abstract class Item implements Shortcutable {
     public boolean isShortcutable() {
         return false;
     }
+
+    public String getDiscriminator() {
+        return getLabel();
+    }
 }

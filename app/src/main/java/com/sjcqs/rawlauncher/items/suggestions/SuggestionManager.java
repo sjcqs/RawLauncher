@@ -2,10 +2,13 @@ package com.sjcqs.rawlauncher.items.suggestions;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.util.ArraySet;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by satyan on 8/25/17.
@@ -41,6 +45,8 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
     private OnItemLaunchedListener onItemLaunchedListener;
 
     private List<Suggestion> suggestions;
+    private Set<String> hiddenItems;
+    private boolean idle = true;
 
     public SuggestionManager(Context context, LoaderManager supportLoaderManager, Collection<Manager> managers) {
         this.context = context;
@@ -48,6 +54,18 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
         searchManager = new InputSearchManager(context,loaderManager);
         this.managers = managers;
         suggestions = new ArrayList<>();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        hiddenItems = pref.getStringSet(
+                context.getString(R.string.blacklist_shared_pref),
+                new ArraySet<String>()
+        );
+
+        Log.d(TAG, "SuggestionManager (hidden): " + hiddenItems.size());
+        String str = "";
+        for (String hiddenItem : hiddenItems) {
+            str += " " + hiddenItem + ";";
+        }
+        Log.d(TAG, "SuggestionManager (hidden): " + str);
     }
 
 
@@ -73,20 +91,30 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
     }
 
     @Override
-    public void onBindViewHolder(ItemHolder holder, int position) {
+    public void onBindViewHolder(final ItemHolder holder, int position) {
         final Suggestion item = suggestions.get(position);
         if (item != null) {
             holder.setIcon(item.getIcon());
             holder.setLabel(item.getLabel());
-            holder.setOnClickListener(new View.OnClickListener() {
-
+            holder.setOnActionListener(new OnActionListener() {
                 @Override
-                public void onClick(View view) {
+                public void onClicked() {
                     if (onItemLaunchedListener != null) {
                         onItemLaunchedListener.onItemLaunched(item.getItem());
                     }
                     context.startActivity(item.getIntent());
                 }
+
+                @Override
+                public boolean onHide() {
+                    return false;
+                }
+
+                @Override
+                public boolean onRemove() {
+                    return false;
+                }
+
             });
         }
     }
@@ -114,6 +142,30 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
         }
     }
 
+    public void hideItem(Suggestion item) {
+        Log.d(TAG, "hideItem: " + item.getDiscriminator());
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        hiddenItems.add(item.getDiscriminator());
+
+        pref.edit()
+                .putStringSet(context.getString(R.string.blacklist_shared_pref), hiddenItems).apply();
+
+        suggestions.remove(item);
+    }
+
+    public void hideItem(int position) {
+        hideItem(suggestions.get(position));
+        notifyDataSetChanged();
+    }
+
+    public void uninstallApp(int position) {
+
+    }
+
+    public Item getItem(int i) {
+        return suggestions.get(i).getItem();
+    }
+
     @Override
     public Loader<List<Suggestion>> onCreateLoader(int id, Bundle args) {
         String str = args.getString(context.getString(R.string.arg_input));
@@ -123,31 +175,49 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
     @Override
     public void onLoadFinished(Loader<List<Suggestion>> loader, List<Suggestion> data) {
         suggestions.clear();
-        suggestions.addAll(data);
-        Collections.sort(suggestions,Suggestion.SUGGESTION_COMPARATOR);
-        for (Suggestion suggestion : suggestions) {
-            Log.d(TAG, suggestion.getLabel() + ": " + suggestion.getRate());
+        for (Suggestion suggestion : data) {
+            boolean found = false;
+            for (String term : hiddenItems) {
+                if (suggestion.getDiscriminator().equalsIgnoreCase(term)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                suggestions.add(suggestion);
+            }
         }
+        Collections.sort(suggestions, Suggestion.SUGGESTION_COMPARATOR);
         notifyDataSetChanged();
     }
 
     @Override
     public void onLoaderReset(Loader<List<Suggestion>> loader) {
-        //suggestions.clear();
+
     }
 
-    public Item getItem(int i) {
-        return suggestions.get(i).getItem();
+    public boolean isIdle() {
+        return idle;
     }
 
-    class ItemHolder extends RecyclerView.ViewHolder {
-        View view;
+
+    interface OnActionListener {
+        void onClicked();
+
+        boolean onHide();
+
+        boolean onRemove();
+    }
+
+    public class ItemHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, View.OnLongClickListener {
         private TextView labelView;
         private ImageView iconView;
+        private OnActionListener onActionListener;
+        private boolean enabled = true;
 
         ItemHolder(View itemView) {
             super(itemView);
-            view = itemView;
             labelView = itemView.findViewById(R.id.label);
             iconView = itemView.findViewById(R.id.item_icon);
         }
@@ -160,8 +230,26 @@ public class SuggestionManager extends  RecyclerView.Adapter<SuggestionManager.I
             labelView.setText(text);
         }
 
-        void setOnClickListener(View.OnClickListener onClickListener) {
-            itemView.setOnClickListener(onClickListener);
+        void setOnActionListener(OnActionListener listener) {
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+            this.onActionListener = listener;
+        }
+
+        public void clearActionListener() {
+            this.onActionListener = null;
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (enabled) {
+                onActionListener.onClicked();
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            return false;
         }
     }
 }
