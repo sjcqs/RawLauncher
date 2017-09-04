@@ -34,7 +34,7 @@ public class InputSearchManager extends Manager {
         List<Suggestion> suggestions = new ArrayList<>();
         for (Item item : items) {
             InputSearch search = (InputSearch) item;
-            double rate = StringUtil.canBeSuggested(search.getName(), input);
+            double rate = StringUtil.canBeSuggested(search.getDiscriminator(), input);
             if (rate <= StringUtil.MAX_RATE) {
                 if (rate != 0) {
                     rate += InputSearchLoader.BASE_PRIORITY;
