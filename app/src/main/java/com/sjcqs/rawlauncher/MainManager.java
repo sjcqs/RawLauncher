@@ -17,6 +17,7 @@ import com.sjcqs.rawlauncher.utils.interfaces.OnItemClickedListener;
 import com.sjcqs.rawlauncher.utils.interfaces.Reloadable;
 import com.sjcqs.rawlauncher.utils.interfaces.Suggestor;
 import com.sjcqs.rawlauncher.views.ShortcutLayout;
+import com.sjcqs.rawlauncher.views.UserInputView;
 
 import java.util.Date;
 import java.util.Map;
@@ -33,14 +34,17 @@ class MainManager implements OnItemClickedListener, Reloadable, Suggestor {
     private final Map<Integer, Manager> managers;
     private final SuggestionManager suggestionManager;
     private final ShortcutManager shortcutManager;
+    private final UserInputView inputView;
     private boolean shortcutsUpToDate = false;
 
     MainManager(
             RawLauncher activity,
+            UserInputView inputView,
             final RecyclerView suggestionRecyclerView,
             ShortcutLayout shortcutLayout
     ) {
         this.raw = activity;
+        this.inputView = inputView;
 
         LoaderManager loaderManager = raw.getSupportLoaderManager();
         managers = ManagerUtils.loadManagers(raw, loaderManager);
@@ -81,6 +85,8 @@ class MainManager implements OnItemClickedListener, Reloadable, Suggestor {
 
     @Override
     public void onItemClicked(Item item) {
+        inputView.clearInput();
+        inputView.hideKeyboard();
         raw.startActivity(item.getIntent());
         updateItemStats(item);
     }

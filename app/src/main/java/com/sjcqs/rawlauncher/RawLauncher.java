@@ -37,7 +37,7 @@ public class RawLauncher extends AppCompatActivity {
         inputView = (UserInputView) findViewById(R.id.user_input_view);
         final RecyclerView suggestionRecyclerView = (RecyclerView) findViewById(R.id.suggestions);
         ShortcutLayout shortcutLayout = (ShortcutLayout) findViewById(R.id.shortcuts);
-        mainManager = new MainManager(this, suggestionRecyclerView, shortcutLayout);
+        mainManager = new MainManager(this, inputView, suggestionRecyclerView, shortcutLayout);
 
         inputView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -193,12 +193,5 @@ public class RawLauncher extends AppCompatActivity {
             mainManager.clearSuggestions();
         }
         mainManager.reload();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        inputView.clearInput();
-        inputView.hideKeyboard();
     }
 }
