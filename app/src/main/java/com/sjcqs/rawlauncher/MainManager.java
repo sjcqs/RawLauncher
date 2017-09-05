@@ -34,6 +34,8 @@ class MainManager implements OnItemClickedListener, Reloadable, Suggestor {
     private final Map<Integer, Manager> managers;
     private final SuggestionManager suggestionManager;
     private final ShortcutManager shortcutManager;
+    private final HistoryManager historyManager;
+
     private final UserInputView inputView;
     private boolean shortcutsUpToDate = false;
 
@@ -61,6 +63,7 @@ class MainManager implements OnItemClickedListener, Reloadable, Suggestor {
         suggestionManager.setOnItemClickedListener(this);
 
         shortcutManager.setOnItemClickedListener(this);
+        historyManager = new HistoryManager(raw);
     }
 
     private void updateItemStats(Item item) {
@@ -85,14 +88,16 @@ class MainManager implements OnItemClickedListener, Reloadable, Suggestor {
 
     @Override
     public void onItemClicked(Item item) {
+        historyManager.push(item.getLabel());
         inputView.clearInput();
         inputView.hideKeyboard();
-        raw.startActivity(item.getIntent());
         updateItemStats(item);
+        raw.startActivity(item.getIntent());
     }
 
     @Override
     public void reload() {
+        historyManager.reload();
         if (!shortcutsUpToDate) {
             shortcutManager.reload();
             shortcutsUpToDate = true;
