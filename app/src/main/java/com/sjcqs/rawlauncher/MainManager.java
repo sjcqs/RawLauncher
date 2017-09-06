@@ -41,7 +41,7 @@ class MainManager implements OnItemClickedListener, Reloadable, Suggestor {
 
     MainManager(
             RawLauncher activity,
-            UserInputView inputView,
+            final UserInputView inputView,
             final RecyclerView suggestionRecyclerView,
             ShortcutLayout shortcutLayout
     ) {
@@ -63,6 +63,26 @@ class MainManager implements OnItemClickedListener, Reloadable, Suggestor {
         suggestionManager.setOnItemClickedListener(this);
 
         shortcutManager.setOnItemClickedListener(this);
+
+        inputView.setOnInputActionListener(new UserInputView.OnInputActionListener() {
+            @Override
+            public boolean onActionDone(String str) {
+                return launchItem(0);
+            }
+
+            @Override
+            public void onUpPressed() {
+                String str = historyManager.next();
+                inputView.setInput(str);
+            }
+
+            @Override
+            public void onDownPressed() {
+                String str = historyManager.previous();
+                inputView.setInput(str);
+            }
+        });
+
         historyManager = new HistoryManager(raw);
     }
 
