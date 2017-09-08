@@ -72,13 +72,13 @@ class MainManager implements OnItemClickedListener, Reloadable, Suggestor {
 
             @Override
             public void onUpPressed() {
-                String str = historyManager.next();
+                String str = historyManager.previous();
                 inputView.setInput(str);
             }
 
             @Override
             public void onDownPressed() {
-                String str = historyManager.previous();
+                String str = historyManager.next();
                 inputView.setInput(str);
             }
         });

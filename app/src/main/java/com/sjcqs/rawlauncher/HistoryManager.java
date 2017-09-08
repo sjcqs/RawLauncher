@@ -31,7 +31,6 @@ public class HistoryManager implements Reloadable {
     public void reload() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         int size = pref.getInt(context.getString(R.string.history_size_shared_preferences), 0);
-        index = 0;
         history.clear();
         for (int i = 0; i < size && i < HISTORY_SIZE; i++) {
             String item = pref
@@ -40,12 +39,12 @@ public class HistoryManager implements Reloadable {
                 history.add(item);
             }
             lastItem = item;
-
             Log.d(TAG, index + ": " + item);
         }
         pref.edit()
                 .putInt(context.getString(R.string.history_size_shared_preferences), history.size())
                 .apply();
+        index = history.size() - 1;
     }
 
     public String previous() {
@@ -91,25 +90,20 @@ public class HistoryManager implements Reloadable {
         }
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context)
                 .edit();
-        if (history.size() == HISTORY_SIZE) {
-            history = history.subList(1, HISTORY_SIZE);
-            history.add(str);
-            for (int i = 0; i < history.size(); i++) {
-                editor.putString(
-                        context.getString(R.string.history_item_shared_preferences, i),
-                        history.get(i)
-                );
-            }
-        } else {
-            history.add(str);
-            editor.putString(
-                    context.getString(R.string.history_item_shared_preferences, history.size() - 1),
-                    str
-            );
+        history.add(str);
+        int diff = history.size() - HISTORY_SIZE;
+        if (diff > 0) {
+            history = history.subList(diff, history.size());
         }
         lastItem = str;
+        index = history.size() - 1;
+        for (int i = 0; i < history.size(); i++) {
+            editor.putString(
+                    context.getString(R.string.history_item_shared_preferences, index),
+                    history.get(i)
+            );
+        }
         editor.putInt(context.getString(R.string.history_size_shared_preferences), history.size());
         editor.apply();
-
     }
 }
