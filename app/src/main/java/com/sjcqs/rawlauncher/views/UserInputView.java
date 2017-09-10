@@ -162,10 +162,9 @@ public class UserInputView extends RelativeLayout {
     }
 
     public void hideKeyboard() {
-        userEditText.clearFocus();
         InputMethodManager imm =
                 (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(userEditText.getWindowToken(), InputMethodManager.SHOW_IMPLICIT);
+        imm.hideSoftInputFromWindow(userEditText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     public void setHint(final String hint) {
